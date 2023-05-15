@@ -1,0 +1,30 @@
+name: "Compile and release executable JAR"
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest
+        uses: actions/checkout@v3
+      - name: Setup Java & Maven
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: 'maven'
+      - name: Assemble executable JAR
+        run: mvn clean compile assembly:single license:remove
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: src2abs
+          path: src2abs-executable.jar
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: src2abs-executable.jar
