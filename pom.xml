@@ -85,9 +85,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>edu.wm.cs</groupId>
-      <artifactId>javalexer</artifactId>
-      <version>1.0.0</version>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>4.7.3</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
@@ -135,26 +136,6 @@
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>3.1.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <groupId>edu.wm.cs</groupId>
-              <artifactId>javalexer</artifactId>
-              <version>1.0.0</version>
-              <file>${project.basedir}/lib/javalexer.jar</file>
-              <packaging>jar</packaging>
-              <generatePom>true</generatePom>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

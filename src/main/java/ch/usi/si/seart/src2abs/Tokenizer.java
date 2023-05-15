@@ -1,6 +1,5 @@
 package ch.usi.si.seart.src2abs;
 
-import edu.wm.cs.compiler.tools.generators.scanners.JavaLexer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,8 +10,6 @@ import org.antlr.v4.runtime.Token;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,13 +17,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class Tokenizer {
+class Tokenizer {
 
 	private static final String SPACED_DOT = " . ";
 
@@ -58,17 +54,17 @@ public class Tokenizer {
 			Token t = tokens.get(i);
 
 			//Handling annotations
-			if (t.getType() == JavaLexer.AT){
+			if (t.getType() == Lexer.AT){
 				int j = i + 1;
 				Token nextToken = tokens.get(j);
 
-				if (nextToken.getType() == JavaLexer.Identifier && annotations.contains(nextToken.getText())) {
+				if (nextToken.getType() == Lexer.Identifier && annotations.contains(nextToken.getText())) {
 					//This is an annotation
 					token = getAnnotationID(nextToken.getText());
 					i = j;
 				}
 
-			} else if (t.getType() == JavaLexer.Identifier) {
+			} else if (t.getType() == Lexer.Identifier) {
 				String tokenName = t.getText();
 				int j = i + 1;
 
@@ -76,7 +72,7 @@ public class Tokenizer {
 				while (j < tokens.size()) {
 					Token nextToken = tokens.get(j);
 					if (expectDOT) {
-						if (nextToken.getType() == JavaLexer.DOT) {
+						if (nextToken.getType() == Lexer.DOT) {
 							tokenName += nextToken.getText();
 							expectDOT = false;
 						} else {
@@ -84,9 +80,9 @@ public class Tokenizer {
 							break;
 						}
 					} else {
-						if ((nextToken.getType() == JavaLexer.Identifier || nextToken.getType() == JavaLexer.THIS
-								|| nextToken.getType() == JavaLexer.CLASS || nextToken.getType() == JavaLexer.NEW) &&
-								tokens.get(j-1).getType() == JavaLexer.DOT) {
+						if ((nextToken.getType() == Lexer.Identifier || nextToken.getType() == Lexer.THIS
+								|| nextToken.getType() == Lexer.CLASS || nextToken.getType() == Lexer.NEW) &&
+								tokens.get(j-1).getType() == Lexer.DOT) {
 							tokenName += nextToken.getText();
 						} else {
 							i = j-1;
@@ -98,13 +94,13 @@ public class Tokenizer {
 
 
 				token = analyzeIdentifier(tokenName, tokens, i);
-			} else if (t.getType() == JavaLexer.CharacterLiteral) {
+			} else if (t.getType() == Lexer.CharacterLiteral) {
 				token = getCharId(t);
-			} else if (t.getType() == JavaLexer.FloatingPointLiteral) {
+			} else if (t.getType() == Lexer.FloatingPointLiteral) {
 				token = getFloatId(t);
-			} else if (t.getType() == JavaLexer.IntegerLiteral) {
+			} else if (t.getType() == Lexer.IntegerLiteral) {
 				token = getIntId(t);
-			} else if (t.getType() == JavaLexer.StringLiteral) {
+			} else if (t.getType() == Lexer.StringLiteral) {
 				token = getStringId(t);
 			} else {
 				token = t.getText();
@@ -119,7 +115,7 @@ public class Tokenizer {
 	@SneakyThrows
 	public static List<Token> readTokens(String sourceCode) {
 		InputStream inputStream = new ByteArrayInputStream(sourceCode.getBytes(StandardCharsets.UTF_8));
-		JavaLexer jLexer = new JavaLexer(new ANTLRInputStream(inputStream));
+		Lexer jLexer = new Lexer(new ANTLRInputStream(inputStream));
 		jLexer.removeErrorListeners();
 
 		List<Token> tokens = new ArrayList<>();
@@ -128,11 +124,6 @@ public class Tokenizer {
 		}
 
 		return tokens;
-	}
-
-	@SneakyThrows
-	public void export(Path outFile) {
-		Files.write(outFile, getKeysAndValues(export()));
 	}
 
 	public Map<String, String> export() {
@@ -148,13 +139,6 @@ public class Tokenizer {
 		)
 		.flatMap(Function.identity())
 		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2, LinkedHashMap::new));
-	}
-
-	private List<String> getKeysAndValues(Map<String, String> map){
-		Collector<CharSequence, ?, String> commaCollector = Collectors.joining(",");
-		String keys = map.keySet().stream().collect(commaCollector);
-		String values = map.values().stream().collect(commaCollector);
-		return List.of(keys, values);
 	}
 
 	private String analyzeIdentifier(String token, List<Token> tokens, int i) {
@@ -197,7 +181,7 @@ public class Tokenizer {
 		boolean couldBeMethod = false;
 		if (i + 1 < tokens.size()) {
 			Token t = tokens.get(i + 1);
-			if (t.getType() == JavaLexer.LPAREN) {
+			if (t.getType() == Lexer.LPAREN) {
 				couldBeMethod = true;
 			}
 		}
@@ -206,7 +190,7 @@ public class Tokenizer {
 			Token t1 = tokens.get(i - 1);
 			Token t2 = tokens.get(i - 2);
 
-			if (t1.getType() == JavaLexer.COLON && t2.getType() == JavaLexer.COLON) {
+			if (t1.getType() == Lexer.COLON && t2.getType() == Lexer.COLON) {
 				couldBeMethod = true;
 			}
 		}

@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @Getter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class Parser {
+class Parser {
 
 	public enum Granularity {
 		METHOD, CLASS
@@ -34,14 +34,17 @@ public class Parser {
 
 	Granularity granularity;
 
-	public Parser() {
-		this.granularity = null;
-	}
-
 	public void parse(String sourceCode) {
-		Function<String, Node> parsingFunction = StaticJavaParser::parse;
-		if (granularity == Granularity.METHOD) {
-			parsingFunction = StaticJavaParser::parseMethodDeclaration;
+		Function<String, Node> parsingFunction;
+		switch (granularity) {
+			case CLASS:
+				parsingFunction = StaticJavaParser::parse;
+				break;
+			case METHOD:
+				parsingFunction = StaticJavaParser::parseMethodDeclaration;
+				break;
+			default:
+				throw new UnsupportedOperationException("Parsing not supported at '" + granularity + "'");
 		}
 
 		parse(sourceCode, parsingFunction);
@@ -52,7 +55,7 @@ public class Parser {
 		traverseNode(node);
 	}
 
-	public void traverseNode(Node node) {
+	private void traverseNode(Node node) {
 		// create set of annotations
 		node.findAll(AnnotationExpr.class).stream()
 				.map(AnnotationExpr::getNameAsString)

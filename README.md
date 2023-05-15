@@ -74,14 +74,22 @@ mvn clean compile assembly:single
 ## Usage
 
 ```shell
-java -jar src2abs-executable.jar <code_granularity> <input_path> <output_path> <idioms_path>
+java -jar src2abs-executable.jar [-hV] [-g <granularity>] [-i <idioms>] [-o <output>] <input>
 ```
 
 Arguments:
-- `<code_granularity>`: code granularity (either `METHOD` or `CLASS`);
-- `<input_path>`: path of the file containing the source code to abstract;
-- `<output_path>`: path of the file (to be created) where the abstract source code will be saved; 
-- `<idioms_path>`: path of the file containing the list of idioms.
+```
+  <input>                           Path to file containing the source code used as input.
+  -g, --granularity <granularity>   The granularity level that abstraction will be
+                                    performed on. Can be one of: METHOD, CLASS.
+                                    Default: CLASS.
+  -i, --idioms <idioms>             Path to the file containing a newline-separated list of idioms.
+  -o, --output <output>             Path to file which will contain the abstraction result.
+                                    If not specified, the abstraction result
+                                    and mappings are printed to console.
+  -h, --help                        Show this help message and exit.
+  -V, --version                     Print version information and exit.
+```
 
 ## Credits
 
@@ -91,4 +99,4 @@ and used in the context of the following research projects:
 1. On Learning Meaningful Code Changes via Neural Machine Translation
 2. An Empirical Study on Learning Bug-Fixing Patches in the Wild via Neural Machine Translation
 
-If you are using `src2abs` for research purposes, please cite according to the [citation file](CITATION.bib).
+If you are using `src2abs` for research purposes, please cite according to the provided [citation file](CITATION.bib).
