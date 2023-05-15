@@ -73,6 +73,18 @@ mvn clean compile assembly:single
 
 ## Usage
 
+### Dependency
+
+```xml
+<dependency>
+  <groupId>ch.usi.si.seart</groupId>
+  <artifactId>src2abs</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+### Executable
+
 ```shell
 java -jar src2abs-executable.jar [-hV] [-g <granularity>] [-i <idioms>] [-o <output>] <input>
 ```
